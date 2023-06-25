@@ -134,7 +134,7 @@ func (f *FillForm) fillInput() {
 			_ = chromedp.SendKeys(nodeIds, value, chromedp.ByNodeID).Do(tCtxN)
 			// 再直接赋值JS属性
 			_ = chromedp.SetAttributeValue(nodeIds, "value", value, chromedp.ByNodeID).Do(tCtxN)
-		} else if attrType == "email" || attrType == "password" || attrType == "tel" {
+		} else if attrType == "email" || attrType == "password" || attrType == "tel" || attrType == "username" {
 			value := f.GetMatchInputText(attrType)
 			var nodeIds = []cdp.NodeID{node.NodeID}
 			// 先使用模拟输入
