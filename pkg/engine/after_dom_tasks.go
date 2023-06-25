@@ -158,21 +158,29 @@ func (f *FillForm) fillInput() {
 
 func (f *FillForm) fillTextarea() {
 	defer f.tab.fillFormWG.Done()
+	var nodes []*cdp.Node
 	ctx := f.tab.GetExecutor()
 	tCtx, cancel := context.WithTimeout(ctx, time.Second*2)
 	defer cancel()
 	value := f.GetMatchInputText("other")
 
-	textareaNodes, textareaErr := f.tab.GetNodeIDs(`textarea`)
-	if textareaErr != nil || len(textareaNodes) == 0 {
+	
+	err := chromedp.Nodes(`textarea`, &nodes, chromedp.ByQueryAll).Do(tCtx)
+
+	if err != nil {
 		logger.Logger.Debug("fillTextarea: get textarea element err")
-		if textareaErr != nil {
-			logger.Logger.Debug(textareaErr)
-		}
+		logger.Logger.Debug(err)
 		return
 	}
 
-	_ = chromedp.SendKeys(textareaNodes, value, chromedp.ByNodeID).Do(tCtx)
+	for _, node := range nodes {
+		tCtxN, cancelN := context.WithTimeout(ctx, time.Second*5)
+		var nodeIds = []cdp.NodeID{node.NodeID}
+		logger.Logger.Debug("fillTextarea...")
+		logger.Logger.Debug(value)
+		_ = chromedp.SendKeys(nodeIds, value, chromedp.ByNodeID).Do(tCtxN)
+		cancelN()
+	}
 }
 
 func (f *FillForm) fillMultiSelect() {
